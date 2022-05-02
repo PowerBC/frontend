@@ -1,0 +1,1 @@
+{"version":"0.0.1","name":"powerbc-frontend","dependencies":{"@quasar/extras":{"version":"1.13.6"},"axios":{"version":"0.21.4"},"core-js":{"version":"3.22.3"},"pinia":{"version":"2.0.13"},"quasar":{"version":"2.6.6"},"vue-i18n":{"version":"9.1.9"},"vue-router":{"version":"4.0.14"},"vue":{"version":"3.2.33"}}}

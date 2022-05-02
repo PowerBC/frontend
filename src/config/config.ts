@@ -1,0 +1,1 @@
+export const backend = 'https://localhost:7135'; // localhost | ipv4 in network
