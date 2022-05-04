@@ -17,9 +17,10 @@
     </q-item-section>
   </q-item>
 
+  <!--  -->
   <q-dialog
     v-model="toggleCreateGroupDialog"
-    @before-hide="resetInput"
+    @before-show="resetInput"
   >
     <q-card style="width: 700px">
       <q-card-section class="row items-center q-pa-md">
@@ -35,7 +36,8 @@
             filled
             type="text"
             label="Name"
-            label-color="white"
+            label-color="grey"
+            class="text-h6"
             :rules="[val => val && val.length > 0 || 'Please type the group name.']"
           />
           <q-input
@@ -43,7 +45,8 @@
             filled
             type="textarea"
             label="Description"
-            label-color="white"
+            label-color="grey"
+            class="text-h6"
             rows="3"
           />
         </div>
@@ -76,7 +79,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { useQuasar, Cookies } from 'quasar'
+import { useQuasar, Cookies, Dialog } from 'quasar'
 import { api } from 'boot/axios'
 import { backend } from 'src/config/config'
 
@@ -96,31 +99,37 @@ export default defineComponent({
     $q.dark.set(true)
 
     return {
-      $q
     }
   },
 
   methods: {
     createGroup: function () {
-      // fix me: api.post
-
-      //for debug, remove this
-      this.$emit('updateGroupMenu', this.groupName)
-      this.$q.dialog({
-        html: true,
-        title: '<span class="text-positive">Success</span>',
-        message: 
-        `<span class="text-grey">
-          The group <b>${this.groupName}</b> has been successfully created.
-        </span>`,
-        ok:{
-          label: 'Ok',
-          color: 'primary',
-          'no-caps': true,
-          rounded: true
+      api.post(
+        `${backend}/api/Group/createGroup`,
+        {
+          Name: this.groupName,
+          Description: this.groupDesc,
         },
+        {headers: {Authorization: 'Bearer ' + Cookies.get('token')}}
+      )
+      .then(() => {
+        Dialog.create({
+          html: true,
+          title: '<span class="text-positive">Success</span>',
+          message: 
+          `<span class="text-grey">
+            The group <b>${this.groupName}</b> has been successfully created.
+          </span>`,
+          ok:{
+            label: 'Ok',
+            color: 'primary',
+            'no-caps': true,
+            rounded: true
+          },
+        })
       })
     },
+
     resetInput: function () {
       this.groupName = ''
       this.groupDesc = ''

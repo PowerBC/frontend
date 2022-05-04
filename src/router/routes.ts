@@ -1,17 +1,4 @@
 import { RouteRecordRaw } from 'vue-router';
-import { backend } from 'src/config/config';
-import { Cookies } from 'quasar'
-import { api } from 'boot/axios'
-
-const isAuthenticated = () => {
-  const token = Cookies.get('token')
-  api.post(
-    `${backend}/api/User/authenticate`,
-    {token: token})
-    .then(response => {
-      return response.data
-    })
-}
 
 const routes: RouteRecordRaw[] = [
   {
@@ -21,19 +8,19 @@ const routes: RouteRecordRaw[] = [
       { 
         path: '',
         name: 'Home',
-        component: () => import('src/pages/HomePage.vue'),
+        component: () => import('pages/HomePage.vue'),
       },
       
       { 
         path: 'login', 
         name: 'Login',
-        component: () => import('src/pages/LoginPage.vue'),
+        component: () => import('pages/LoginPage.vue'),
       },
       
       { 
         path: 'signup',
         name: 'SignUp', 
-        component: () => import('src/pages/SignUpPage.vue'),
+        component: () => import('pages/SignUpPage.vue'),
       },
         
     ],

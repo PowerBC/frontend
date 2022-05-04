@@ -105,7 +105,7 @@ export default defineComponent({
           name: this.name,
           password: this.password
         },)
-        .then(response => {
+        .then(() => {
           
           this.isEmailError = false;
           this.emailErrorMsg = '';

@@ -50,7 +50,7 @@
 import { defineComponent } from 'vue'
 import { api } from 'boot/axios'
 import { backend } from 'src/config/config'
-import { Cookies, useQuasar } from 'quasar'
+import { Cookies,  useQuasar } from 'quasar'
 
 export default defineComponent({
   name: 'SignUpLayout',
@@ -85,7 +85,7 @@ export default defineComponent({
           Cookies.set('token', token)
 
           // 
-          this.$router.replace('/main')
+          this.$router.push('/main')
         })
         .catch(error => {
           // Alert
@@ -106,6 +106,8 @@ export default defineComponent({
           this.email=''; this.password='';
         })
     }
-  }
+  },
+
+
 });
 </script>

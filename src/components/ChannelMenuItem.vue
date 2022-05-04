@@ -3,17 +3,8 @@
     clickable
     v-ripple
   >
-    <q-item-section avatar>
-      <q-avatar
-        color="primary"
-        icon="group"
-        size="42px"
-        rounded
-      />
-    </q-item-section>
-
     <q-item-section>
-      <q-item-label>{{ name }}</q-item-label>
+      <q-item-label class="text-h6 text-grey" >{{ this.name }}</q-item-label>
     </q-item-section>
   </q-item>
 </template>
@@ -22,23 +13,20 @@
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: 'GroupMenuItem',
+  name: 'ChannelMenuItem',
   props: {
+    groupId: {
+      type: String,
+      required: true
+    },
     id: {
       type: String,
       required: true
     },
-
     name: {
       type: String,
       required: true
     },
-
-    description: {
-      type: String,
-      required: true
-    },
-
   }
 });
 </script>

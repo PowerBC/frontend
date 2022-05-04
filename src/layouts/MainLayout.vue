@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="hHh Lpr hFf"> <!--lHh Lpr lFf-->
+  <q-layout view="hHh Lpr fFf"> <!--lHh Lpr lFf-->
 
     <q-header elevated>
       <q-toolbar class="bg-dark">
@@ -28,7 +28,7 @@
       elevated
       bordered
     >
-      <CreateGroup v-on:updateGroupMenu="addGroupMenuItem"/>
+      <CreateGroup />
       
       <q-separator />
       
@@ -36,37 +36,38 @@
         v-for="(group, index) in groupList"
         :key="index"
         v-bind="group"
+        @click="changeGroup(index)"
       />
-      
-      
       
     </q-drawer>
 
     <q-page-container>
-      <router-view />
+      <GroupPage 
+        v-if="currentGroupId"
+        v-bind="{
+          id: currentGroupId, 
+          name: currentGroupName, 
+          description: currentGroupDesc}"
+      />
     </q-page-container>
+
+    <q-footer>
+    </q-footer>
 
   </q-layout>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
-import { useQuasar } from 'quasar'
+import { defineComponent, onMounted, ref } from 'vue'
+import { useQuasar, Cookies } from 'quasar'
+import { api } from 'boot/axios'
+import { backend } from 'src/config/config'
+import * as signalR from '@microsoft/signalr'
 
 import GroupMenuItem from 'src/components/GroupMenuItem.vue'
 import CreateGroup from 'src/components/CreateGroup.vue'
+import GroupPage from 'pages/GroupPage.vue'
 
-const linksList = [
-  {
-    groupName: 'OOAD專題',
-  },
-  {
-    groupName: '攝影Workshop',
-  },
-  {
-    groupName: '公司群組',
-  },
-];
 
 export default defineComponent({
   name: 'MainLayout',
@@ -74,34 +75,75 @@ export default defineComponent({
   components: {
     GroupMenuItem,
     CreateGroup,
+    GroupPage,
   },
 
   setup () {
-    const leftDrawerOpen = ref(true)
-
     const $q = useQuasar()
     $q.dark.set(true)
 
-    return {
-      $q,
-      leftDrawerOpen,
-      miniState: ref(true),
-      toggleLeftDrawer () {
-        leftDrawerOpen.value = !leftDrawerOpen.value
+    const leftDrawerOpen = ref(true)
+    
+    const groupList = ref(Array<{id: string, name: string, description: string}>())
+    const currentGroupId = ref('')
+    const currentGroupName = ref('')
+    const currentGroupDesc = ref('')
+
+    const updateGroupList = async function () {
+      const { data } = await api.get(
+        `${backend}/api/Group/groupList`,
+        {headers: {Authorization: 'Bearer ' + Cookies.get('token')}}
+      )
+      groupList.value = data
+      if (groupList.value.length > 0)
+      {
+        currentGroupId.value = groupList.value[0].id
+        currentGroupName.value = groupList.value[0].name
+        currentGroupDesc.value = groupList.value[0].description
       }
     }
-  },
 
-  data () {
+    onMounted(async () => {
+      console.log('mainlayout mounted')
+      const { data } = await api.get(
+        `${backend}/api/Group/groupList`,
+        {headers: {Authorization: 'Bearer ' + Cookies.get('token')}}
+      )
+      groupList.value = data
+
+      if (groupList.value.length > 0)
+      {
+        currentGroupId.value = groupList.value[0].id
+        currentGroupName.value = groupList.value[0].name
+        currentGroupDesc.value = groupList.value[0].description
+      }
+      console.log(groupList.value)
+    })
+    
+    // 
+    const connection = 
+      new signalR.HubConnectionBuilder()
+      .withUrl(`${backend}/hub/GroupService`).build()
+    connection.on('UpdateGroupList', updateGroupList)
+    connection.start()
+
     return {
-      groupList: Array<object>(),
+      leftDrawerOpen,
+      miniState: ref(true),
+      groupList,
+      currentGroupId,
+      currentGroupName,
+      currentGroupDesc,
+      toggleLeftDrawer () {
+        leftDrawerOpen.value = !leftDrawerOpen.value
+      },
+      changeGroup (index: number) {
+        currentGroupId.value = groupList.value[index].id
+        currentGroupName.value = groupList.value[index].name
+        currentGroupDesc.value = groupList.value[index].description
+        console.log(`Current Group: ${groupList.value[index].id}`)
+      }
     }
-  },
-
-  methods: {
-    addGroupMenuItem: function (name: string) {
-      this.groupList.push({groupName: name,})
-    },
   },
 
 
